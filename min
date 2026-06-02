@@ -19,7 +19,9 @@ local function delplr()
 	local n=lp.Name
 	for i,v in pairs(game.Players:GetChildren())do
 		if v.Name~=n then
-			v:Destroy()
+			game.Workspace[v.Name]:Destroy()
+			v.StarterGear:Destroy()
+			v.Backpack:Destroy()
 		end
 	end
 end
