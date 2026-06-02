@@ -256,7 +256,7 @@ d.MouseButton1Down:Connect(function()
 	local nbp=to+getbp()
 	coroutine.wrap(function()
 		while getbp()<nbp do
-			wait(0.05)
+			wait(0.1)
 			pcall(function()
 				game:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(lp,5949054,true)
 			end)
@@ -315,5 +315,5 @@ onc.MouseButton1Down:Connect(function()
 end)
 repeat
 	wait(0.3)
-	nw.Text = be and getch() or getbp()
+	nw.Text=getch()+getbp()
 until not game
