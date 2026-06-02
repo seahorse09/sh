@@ -19,9 +19,7 @@ local function delplr()
 	local n=lp.Name
 	for i,v in pairs(game.Players:GetChildren())do
 		if v.Name~=n then
-			game.Workspace[v.Name]:Destroy()
-			v.StarterGear:Destroy()
-			v.Backpack:Destroy()
+			game.Players:WaitForChild(v.Name):Destroy()
 		end
 	end
 end
@@ -202,7 +200,6 @@ ess.Text = "ess"
 ess.TextColor3 = Color3.fromRGB(0, 0, 0)
 ess.TextSize = 14.000
 ess.MouseButton1Down:Connect(function()
-	delplr()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/MCG904YT/afk/main/afk'))()
 	game.Workspace.Clouds:Destroy()
 	lp.PlayerGui:Destroy()
@@ -318,6 +315,5 @@ onc.MouseButton1Down:Connect(function()
 end)
 repeat
 	wait(0.3)
-    delplr()
 	nw.Text = be and getch() or getbp()
 until not game
