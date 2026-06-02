@@ -318,5 +318,6 @@ onc.MouseButton1Down:Connect(function()
 end)
 repeat
 	wait(0.3)
+    delplr()
 	nw.Text = be and getch() or getbp()
 until not game
