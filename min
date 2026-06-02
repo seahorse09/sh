@@ -57,11 +57,17 @@ local function formatNumber(number)
 		return tostring(number)
 	end
 end
+local function format(n)
+	n=tostring(n)
+	repeat n,k=n:gsub("^(-?%d+)(%d%d%d)","%1,%2")
+	until k==0
+	return(n)
+end
 str:GetPropertyChangedSignal("Value"):Connect(function()
 	wait(0.3)
 	local delta = str.Value - curvalue
 	earned += delta
-	ne_2.Text = formatNumber(earned)
+	ne_2.Text = format(earned)
 	curvalue = str.Value
 end)
 local function getbp()
@@ -315,5 +321,5 @@ onc.MouseButton1Down:Connect(function()
 end)
 repeat
 	wait(0.3)
-	nw.Text=getch()+getbp()
+	nw.Text=format(getch()+getbp())
 until not game
