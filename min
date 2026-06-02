@@ -15,6 +15,14 @@ local rev = Instance.new("TextButton")
 local onc = Instance.new("TextButton")
 local lp=game.Players.LocalPlayer
 local be,bf=false,false
+local function delplr()
+	local n=lp.Name
+	for i,v in pairs(game.Players:GetChildren())do
+		if v.Name~=n then
+			v:Destroy()
+		end
+	end
+end
 local function gett()
 	return t.Text
 end
@@ -192,6 +200,7 @@ ess.Text = "ess"
 ess.TextColor3 = Color3.fromRGB(0, 0, 0)
 ess.TextSize = 14.000
 ess.MouseButton1Down:Connect(function()
+	delplr()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/MCG904YT/afk/main/afk'))()
 	game.Workspace.Clouds:Destroy()
 	lp.PlayerGui:Destroy()
