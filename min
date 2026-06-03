@@ -13,15 +13,41 @@ local nw = Instance.new("TextLabel")
 local ne_2 = Instance.new("TextLabel")
 local rev = Instance.new("TextButton")
 local onc = Instance.new("TextButton")
+local se = Instance.new("TextLabel")
+local sps = Instance.new("TextLabel")
+local ah = Instance.new("TextButton")
+local swt = Instance.new("TextButton")
+local rj = Instance.new("TextButton")
 local lp=game.Players.LocalPlayer
+local ls=lp.leaderstats
 local be,bf=false,false
+local form=true
 local function delplr()
-	local n=lp.Name
 	for i,v in pairs(game.Players:GetChildren())do
-		if v.Name~=n then
+		if v.Name~=lp.Name then
 			game.Players:WaitForChild(v.Name):Destroy()
 		end
 	end
+end
+local function format(n)
+	if form then
+	  n=tostring(n)
+	  repeat n,k=n:gsub("^(-?%d+)(%d%d%d)","%1,%2")
+	  until k==0
+	  return(n)
+	else
+	  if n>=1e12 then
+	    return string.format("%.2fT",n/1e12)
+      elseif n>=1e9 then
+        return string.format("%.2fB",n/1e9)
+      elseif n>=1e6 then
+        return string.format("%.2fM",n/1e6)
+      elseif n>=1e3 then
+        return string.format("%.2fK",n/1e3)
+      else
+		return tostring(n)
+	  end
+    end
 end
 local function gett()
 	return t.Text
@@ -41,35 +67,20 @@ end
 local function getnd()
 	return tonumber(nd.Text)or 25
 end
-local str = lp.leaderstats.Strength
+local str = ls.Strength
 local curvalue = str.Value
 local earned = 0
-local function formatNumber(number)
-	if number >= 1e12 then
-		return string.format("%.2fT",number/1e12)
-	elseif number >= 1e9 then
-		return string.format("%.2fB",number/1e9)
-	elseif number >= 1e6 then
-		return string.format("%.2fM",number/1e6)
-	elseif number >= 1e3 then
-		return string.format("%.2fK",number/1e3)
-	else
-		return tostring(number)
-	end
-end
-local function format(n)
-	n=tostring(n)
-	repeat n,k=n:gsub("^(-?%d+)(%d%d%d)","%1,%2")
-	until k==0
-	return(n)
-end
 str:GetPropertyChangedSignal("Value"):Connect(function()
-	wait(0.3)
 	local delta = str.Value - curvalue
 	earned += delta
 	ne_2.Text = format(earned)
 	curvalue = str.Value
 end)
+local function cal()
+	local c=curvalue
+	task.wait(1)
+	return ls.Strength.Value-c
+end
 local function getbp()
 	local c=0
 	for i,t in pairs(lp.Backpack:GetChildren())do
@@ -99,7 +110,7 @@ ne.Name = "ne"
 ne.Parent = f
 ne.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 ne.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ne.Size = UDim2.new(0, 74, 0, 50)
+ne.Size = UDim2.new(0, 74, 0, 25)
 ne.Font = Enum.Font.SourceSans
 ne.PlaceholderText = "#equip"
 ne.Text = "724"
@@ -110,9 +121,9 @@ w.Parent = f
 w.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 w.BorderColor3 = Color3.fromRGB(0, 0, 0)
 w.Position = UDim2.new(0.5, 0, 0, 0)
-w.Size = UDim2.new(0, 74, 0, 50)
+w.Size = UDim2.new(0, 74, 0, 25)
 w.Font = Enum.Font.SourceSans
-w.PlaceholderText = "wait time"
+w.PlaceholderText = "wait"
 w.Text = "0.5"
 w.TextColor3 = Color3.fromRGB(0, 0, 0)
 w.TextSize = 14.000
@@ -120,7 +131,7 @@ t.Name = "t"
 t.Parent = f
 t.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 t.BorderColor3 = Color3.fromRGB(0, 0, 0)
-t.Position = UDim2.new(0.25, 0, 0.285714298, 0)
+t.Position = UDim2.new(0.25, 0, 0.142857149, 0)
 t.Size = UDim2.new(0, 74, 0, 25)
 t.Font = Enum.Font.SourceSans
 t.PlaceholderText = "tool"
@@ -131,7 +142,7 @@ eq.Name = "eq"
 eq.Parent = f
 eq.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 eq.BorderColor3 = Color3.fromRGB(0, 0, 0)
-eq.Position = UDim2.new(0, 0, 0.285714298, 0)
+eq.Position = UDim2.new(0, 0, 0.142857149, 0)
 eq.Size = UDim2.new(0, 37, 0, 25)
 eq.Font = Enum.Font.SourceSans
 eq.Text = "equip"
@@ -161,7 +172,7 @@ fa.Name = "fa"
 fa.Parent = f
 fa.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 fa.BorderColor3 = Color3.fromRGB(0, 0, 0)
-fa.Position = UDim2.new(0.75, 0, 0.285714298, 0)
+fa.Position = UDim2.new(0.75, 0, 0.142857149, 0)
 fa.Size = UDim2.new(0, 37, 0, 25)
 fa.Font = Enum.Font.SourceSans
 fa.Text = "farm"
@@ -186,7 +197,7 @@ sa.Name = "sa"
 sa.Parent = f
 sa.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 sa.BorderColor3 = Color3.fromRGB(0, 0, 0)
-sa.Position = UDim2.new(0, 0, 0.428571433, 0)
+sa.Position = UDim2.new(0, 0, 0.285714298, 0)
 sa.Size = UDim2.new(0, 37, 0, 25)
 sa.Font = Enum.Font.SourceSans
 sa.Text = "safe"
@@ -199,7 +210,7 @@ ess.Name = "ess"
 ess.Parent = f
 ess.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 ess.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ess.Position = UDim2.new(0.75, 0, 0.428571433, 0)
+ess.Position = UDim2.new(0.75, 0, 0.285714298, 0)
 ess.Size = UDim2.new(0, 37, 0, 25)
 ess.Font = Enum.Font.SourceSans
 ess.Text = "ess"
@@ -240,7 +251,7 @@ nd.Name = "nd"
 nd.Parent = f
 nd.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 nd.BorderColor3 = Color3.fromRGB(0, 0, 0)
-nd.Position = UDim2.new(0.25, 0, 0.428571433, 0)
+nd.Position = UDim2.new(0.25, 0, 0.285714298, 0)
 nd.Size = UDim2.new(0, 74, 0, 25)
 nd.Font = Enum.Font.SourceSans
 nd.PlaceholderText = "#dupe"
@@ -251,17 +262,17 @@ d.Name = "d"
 d.Parent = f
 d.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 d.BorderColor3 = Color3.fromRGB(0, 0, 0)
-d.Position = UDim2.new(0.25, 0, 0.571428597, 0)
+d.Position = UDim2.new(0.25, 0, 0.428571433, 0)
 d.Size = UDim2.new(0, 74, 0, 25)
 d.Font = Enum.Font.SourceSans
 d.Text = "dupe"
 d.TextColor3 = Color3.fromRGB(0, 0, 0)
 d.TextSize = 14.000
 d.MouseButton1Down:Connect(function()
-	local to=getnd()
-	local nbp=to+getbp()
+	local to,s=getnd(),getbp()+getch()
+	local nbp=to+s
 	coroutine.wrap(function()
-		while getbp()<nbp do
+		while getbp()+getch()<nbp do
 			wait(0.1)
 			pcall(function()
 				game:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(lp,5949054,true)
@@ -273,18 +284,18 @@ nw.Name = "nw"
 nw.Parent = f
 nw.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 nw.BorderColor3 = Color3.fromRGB(0, 0, 0)
-nw.Position = UDim2.new(0, 0, 0.714285731, 0)
-nw.Size = UDim2.new(0, 148, 0, 25)
+nw.Position = UDim2.new(0.5, 0, 0.714285731, 0)
+nw.Size = UDim2.new(0, 74, 0, 25)
 nw.Font = Enum.Font.SourceSans
 nw.Text = "#weights"
 nw.TextColor3 = Color3.fromRGB(0, 0, 0)
 nw.TextSize = 14.000
-ne_2.Name = "ne"
+ne_2.Name = "ne_2"
 ne_2.Parent = f
 ne_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 ne_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ne_2.Position = UDim2.new(0, 0, 0.857142866, 0)
-ne_2.Size = UDim2.new(0, 148, 0, 25)
+ne_2.Position = UDim2.new(0.5, 0, 0.857142866, 0)
+ne_2.Size = UDim2.new(0, 74, 0, 25)
 ne_2.Font = Enum.Font.SourceSans
 ne_2.Text = "#earned"
 ne_2.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -293,7 +304,7 @@ rev.Name = "rev"
 rev.Parent = f
 rev.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 rev.BorderColor3 = Color3.fromRGB(0, 0, 0)
-rev.Position = UDim2.new(0, 0, 0.571428597, 0)
+rev.Position = UDim2.new(0, 0, 0.428571433, 0)
 rev.Size = UDim2.new(0, 37, 0, 25)
 rev.Font = Enum.Font.SourceSans
 rev.Text = "reviz"
@@ -306,7 +317,7 @@ onc.Name = "onc"
 onc.Parent = f
 onc.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 onc.BorderColor3 = Color3.fromRGB(0, 0, 0)
-onc.Position = UDim2.new(0.75, 0, 0.571428597, 0)
+onc.Position = UDim2.new(0.75, 0, 0.428571433, 0)
 onc.Size = UDim2.new(0, 37, 0, 25)
 onc.Font = Enum.Font.SourceSans
 onc.Text = "once"
@@ -319,7 +330,68 @@ onc.MouseButton1Down:Connect(function()
 		end
 	end
 end)
+se.Name = "se"
+se.Parent = f
+se.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+se.BorderColor3 = Color3.fromRGB(0, 0, 0)
+se.Position = UDim2.new(0, 0, 0.714285731, 0)
+se.Size = UDim2.new(0, 74, 0, 25)
+se.Font = Enum.Font.SourceSans
+se.Text = "#strength"
+se.TextColor3 = Color3.fromRGB(0, 0, 0)
+se.TextSize = 14.000
+sps.Name = "#sps"
+sps.Parent = f
+sps.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+sps.BorderColor3 = Color3.fromRGB(0, 0, 0)
+sps.Position = UDim2.new(0, 0, 0.857142866, 0)
+sps.Size = UDim2.new(0, 74, 0, 25)
+sps.Font = Enum.Font.SourceSans
+sps.Text = "#sps"
+sps.TextColor3 = Color3.fromRGB(0, 0, 0)
+sps.TextSize = 14.000
+ah.Name = "ah"
+ah.Parent = f
+ah.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ah.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ah.Position = UDim2.new(0, 0, 0.571428597, 0)
+ah.Size = UDim2.new(0, 37, 0, 25)
+ah.Font = Enum.Font.SourceSans
+ah.Text = "anti-hit"
+ah.TextColor3 = Color3.fromRGB(0, 0, 0)
+ah.TextSize = 14.000
+ah.MouseButton1Down:Connect(function()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/MCG904YT/MCG-Script-Hub/main/MCG%20Anti-Hit%20%7C%20GUI'))()
+end)
+swt.Name = "swt"
+swt.Parent = f
+swt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+swt.BorderColor3 = Color3.fromRGB(0, 0, 0)
+swt.Position = UDim2.new(0.75, 0, 0.571428597, 0)
+swt.Size = UDim2.new(0, 37, 0, 25)
+swt.Font = Enum.Font.SourceSans
+swt.Text = "format"
+swt.TextColor3 = Color3.fromRGB(0, 0, 0)
+swt.TextSize = 14.000
+swt.MouseButton1Click:Connect(function()
+	form=not form
+end)
+rj.Name = "rj"
+rj.Parent = f
+rj.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+rj.BorderColor3 = Color3.fromRGB(0, 0, 0)
+rj.Position = UDim2.new(0.25, 0, 0.571428597, 0)
+rj.Size = UDim2.new(0, 74, 0, 25)
+rj.Font = Enum.Font.SourceSans
+rj.Text = "rejoin"
+rj.TextColor3 = Color3.fromRGB(0, 0, 0)
+rj.TextSize = 14.000
+rj.MouseButton1Down:Connect(function()
+	game:GetService("TeleportService"):Teleport(game.PlaceId,lp)
+end)
 repeat
 	wait(0.3)
 	nw.Text=format(getch()+getbp())
+	se.Text=format(game:GetService("ReplicatedStorage").Data[lp.Name].Strength.Value)
+	sps.Text=format(cal())
 until not game
