@@ -113,7 +113,7 @@ ne.BorderColor3 = Color3.fromRGB(0, 0, 0)
 ne.Size = UDim2.new(0, 74, 0, 25)
 ne.Font = Enum.Font.SourceSans
 ne.PlaceholderText = "#equip"
-ne.Text = "724"
+ne.Text = "739"
 ne.TextColor3 = Color3.fromRGB(0, 0, 0)
 ne.TextSize = 14.000
 w.Name = "w"
@@ -237,7 +237,7 @@ ess.MouseButton1Down:Connect(function()
 	l.Brightness = 0
 	settings().Rendering.QualityLevel = "Level01"
 	for i,v in pairs(g:GetDescendants()) do
-		if v:IsA("Part") or v:IsA("MeshPart") then
+		if v:IsA("Part")or v:IsA('UnionOperation')or v:IsA("MeshPart")then
 			v.Material = "Plastic"
 			v.Reflectance = 0
 		elseif v:IsA("Decal") and decalsyeeted then 
@@ -255,7 +255,7 @@ nd.Position = UDim2.new(0.25, 0, 0.285714298, 0)
 nd.Size = UDim2.new(0, 74, 0, 25)
 nd.Font = Enum.Font.SourceSans
 nd.PlaceholderText = "#dupe"
-nd.Text = "723"
+nd.Text = "738"
 nd.TextColor3 = Color3.fromRGB(0, 0, 0)
 nd.TextSize = 14.000
 d.Name = "d"
