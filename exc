@@ -321,8 +321,8 @@ local function OFUKY_fake_script() -- reload.reload_script
 	local reload=script.Parent
 	local exc=reload.Parent.Parent
 	reload.MouseButton1Click:Connect(function()
+    loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
     exc:Destroy()
-		loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
 	end)
 end
 coroutine.wrap(OFUKY_fake_script)()
