@@ -1,6 +1,9 @@
 local g,t=game,task
 local t_w=t.wait
 local g_w,g_p,g_cg,g_l,g_rf,g_rs,g_sg=g.Workspace,g.Players,g.CoreGui,g.Lighting,g.ReplicatedFirst,g.ReplicatedStorage,g.StarterGui
+if(g_cg.nx)then
+  g_cg.nx:Destroy()
+end
 local rs_d=g_rs.Data
 local p=g_p.LocalPlayer
 local p_n,p_b=p.Name,p.Backpack
@@ -302,17 +305,16 @@ clear.BorderSizePixel = 0
 clear.Position = UDim2.new(0.75, 0, 0.771428585, 0)
 clear.Size = UDim2.new(0, 37, 0, 35)
 clear.Image = "rbxassetid://114714345191257"
-local function OFUKY_fake_script() -- reload.reload_script 
+local function OFUKY_fake_script() -- reload.reload_script
 	local script = Instance.new('LocalScript', reload)
 	local reload=script.Parent
 	local exc=reload.Parent.Parent
 	reload.MouseButton1Click:Connect(function()
     loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
-    exc:Destroy()
 	end)
 end
 coroutine.wrap(OFUKY_fake_script)()
-local function HAHSFJW_fake_script() -- kill.kill_script 
+local function HAHSFJW_fake_script() -- kill.kill_script
 	local script = Instance.new('LocalScript', kill)
 	local kill=script.Parent
 	local exc=kill.Parent.Parent
@@ -321,7 +323,7 @@ local function HAHSFJW_fake_script() -- kill.kill_script
 	end)
 end
 coroutine.wrap(HAHSFJW_fake_script)()
-local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script 
+local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script
 	local script = Instance.new('LocalScript', toggle_hub)
 	local toggle=script.Parent
 	local frame_hub=toggle.Parent.frame_hub
