@@ -1,18 +1,38 @@
 local g,t=game,task
 local t_w=t.wait
 local g_w,g_p,g_cg,g_l,g_rf,g_rs,g_sg=g.Workspace,g.Players,g.CoreGui,g.Lighting,g.ReplicatedFirst,g.ReplicatedStorage,g.StarterGui
-if(g_cg.nx)then
-  g_cg.nx:Destroy()
+if(g_cg.exc)then
+  g_cg.exc:Destroy()
 end
 local rs_d=g_rs.Data
 local p=g_p.LocalPlayer
 local p_n,p_b=p.Name,p.Backpack
 local nx={
   p={},
-  is_e=false,
-  is_u=false,
   fm=true
 }
+function nx._serialize(v,i)
+  if(type(v)=='string')then
+    return('"'..v..'"')
+  end
+  v=tostring(v)
+  if(i)then
+    v='['..v..']'
+  end
+  return(v)
+end
+function nx._dump(t,i,s)
+  local d2,t2,t3={},type(t),tostring(t)
+  if(t2~='table')then return(nx._serialize(t))end i,s=(i)or(0),(s)or{}
+  if(s[t])then return'cycle:'..t3 end s[t]=true
+  local i2,n=(' '):rep(i*2),(' '):rep((i+1)*2)
+  d2[1]=t3..'={'
+  for k,v in pairs(t)do
+    d2[#d2+1]=n..nx._serialize(k,true)..'='..nx._serialize(v,i+1,s)
+  end
+  d2[#d2+1]=i2..'}'
+  return(table.concat(d2,'\n'))
+end
 function nx.p_c()
   return((p.Character)or(p.CharacterAdded:Wait()))
 end
@@ -183,7 +203,7 @@ local label_hub = Instance.new("TextLabel")
 local frame_scripts = Instance.new("ScrollingFrame")
 local clear = Instance.new("ImageButton")
 exc.Name = "exc"
-exc.Parent = g.CoreGui
+exc.Parent = g_cg
 exc.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 frame_exc.Name = "frame_exc"
 frame_exc.Parent = exc
@@ -305,7 +325,7 @@ clear.BorderSizePixel = 0
 clear.Position = UDim2.new(0.75, 0, 0.771428585, 0)
 clear.Size = UDim2.new(0, 37, 0, 35)
 clear.Image = "rbxassetid://114714345191257"
-local function OFUKY_fake_script() -- reload.reload_script
+local function OFUKY_fake_script() -- reload.reload_script 
 	local script = Instance.new('LocalScript', reload)
 	local reload=script.Parent
 	local exc=reload.Parent.Parent
@@ -314,7 +334,7 @@ local function OFUKY_fake_script() -- reload.reload_script
 	end)
 end
 coroutine.wrap(OFUKY_fake_script)()
-local function HAHSFJW_fake_script() -- kill.kill_script
+local function HAHSFJW_fake_script() -- kill.kill_script 
 	local script = Instance.new('LocalScript', kill)
 	local kill=script.Parent
 	local exc=kill.Parent.Parent
@@ -323,7 +343,7 @@ local function HAHSFJW_fake_script() -- kill.kill_script
 	end)
 end
 coroutine.wrap(HAHSFJW_fake_script)()
-local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script
+local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script 
 	local script = Instance.new('LocalScript', toggle_hub)
 	local toggle=script.Parent
 	local frame_hub=toggle.Parent.frame_hub
@@ -343,6 +363,5 @@ local function IRBNS_fake_script() -- clear.clear_script
 	clear.MouseButton1Click:Connect(function()
 	  frame_hub.compiler.Text=''
 	end)
-	
 end
 coroutine.wrap(IRBNS_fake_script)()
