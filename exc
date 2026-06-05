@@ -10,6 +10,10 @@ local nx={
   is_u=false,
   fm=true
 }
+if(g_cg.nx)then
+  g_cg.nx:Destroy()
+  loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
+end
 function nx.p_c()
   return((p.Character)or(p.CharacterAdded:Wait()))
 end
@@ -114,6 +118,7 @@ function nx.dupe(to)
   local n=p.Name
   coroutine.wrap(function()
     while((nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))<to)do
+      t_w(0.1)
       pcall(function()
         g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
 		  end)
@@ -320,8 +325,8 @@ local function OFUKY_fake_script() -- reload.reload_script
 	local reload=script.Parent
 	local exc=reload.Parent.Parent
 	reload.MouseButton1Click:Connect(function()
+    exc:Destroy()
 		loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
-		exc:Destroy()
 	end)
 end
 coroutine.wrap(OFUKY_fake_script)()
