@@ -123,32 +123,17 @@ function nx.dupe(am)
   end)()
   return(am)
 end
-function nx.dupeto(to)
-  to=(to)or(0)
-  local n=p.Name
-  coroutine.wrap(function()
-    while((nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))<to)do
-      t_w(0.1)
-      pcall(function()
-        g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
-		  end)
-    end
-  end)()
-  return(to)
-end
 function nx.rj()
   g:GetService("TeleportService"):Teleport(g.PlaceId,p)
 end
 function nx.p_e(t2,c,i,tx) -- equip to character
-  local e=0 nx.is_e=true
+  local e=0
   if(i)then i.Text=(tx)or'unequip'end
-  while(nx.is_e)do
-    for _,v in pairs(p_b:GetChildren())do
-      if(c)and(e>=c)then break end
-	    if(v.Name==t2)then
-        v.Parent=nx.p_c()
-        e+=1
-      end
+  for _,v in pairs(p_b:GetChildren())do
+    if(c)and(e>=c)then break end
+	  if(v.Name==t2)then
+      v.Parent=nx.p_c()
+      e+=1
     end
   end
   return(t2),e,i,tx
@@ -166,15 +151,13 @@ function nx.p_ue(t2,c,i,tx) -- unequip from character
   return(t2),ue,i,tx
 end
 function nx.p_u(t2,c,i,tx) -- use from character
-  local u=0 nx.is_u=true
+  local u=0
   if(i)then i.Text=(tx)or'unuse'end
-  while(nx.is_u)do
-    for _,v in pairs(nx.p_c():GetChildren())do
-	    if(c)and(u>=c)then break end
-	    if(v.Name==t2)then
-        v:Activate()
-        u+=1
-      end
+  for _,v in pairs(nx.p_c():GetChildren())do
+	  if(c)and(u>=c)then break end
+	  if(v.Name==t2)then
+      v:Activate()
+      u+=1
     end
   end
   return(t2),u,i,tx
@@ -183,17 +166,6 @@ function nx.p_uu(t2,i,tx) -- unuse
   nx.is_u=false
   if(i)then i.Text=(tx)or'use'end
   return(t2),i,tx
-end
-function nx.p_uo(t2,c) -- use once
-  local uo=0
-  for _,v in pairs(nx.p_c():GetChildren())do
-    if(c)and(uo>=c)then break end
-    if(v.Name==t2)then
-      v:Activate()
-      uo+=1
-    end
-  end
-  return(t2),uo
 end
 local exc = Instance.new("ScreenGui")
 local frame_exc = Instance.new("Frame")
