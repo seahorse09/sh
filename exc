@@ -110,14 +110,19 @@ function nx.update()
   end
 end
 function nx.dupe(to)
+  to=(to)or(0)
+  local n=p.Name
   coroutine.wrap(function()
-    while((nx.countbp()+nx.countcc())<(to)or(0))do
+    while((nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))<to)do
       pcall(function()
         g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
 		  end)
     end
   end)()
   return(to)
+end
+function nx.rj()
+  g:GetService("TeleportService"):Teleport(g.PlaceId,p)
 end
 function nx.p_e(t2,c,i,tx) -- equip to character
   local e=0 nx.is_e=true
