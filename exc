@@ -109,7 +109,21 @@ function nx.update()
     p[n].weights=nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight')
   end
 end
-function nx.dupe(to)
+function nx.dupe(am)
+  am=(am)or(0)
+  local n=p.Name
+  local to=(nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))+am
+  coroutine.wrap(function()
+    while((nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))<to)do
+      t_w(0.1)
+      pcall(function()
+        g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
+		  end)
+    end
+  end)()
+  return(am)
+end
+function nx.dupeto(to)
   to=(to)or(0)
   local n=p.Name
   coroutine.wrap(function()
