@@ -110,11 +110,13 @@ function nx.update()
   end
 end
 function nx.dupe(to)
-  while((nx.countbp()+nx.countcc())<(to)or(0))do
-    pcall(function()
-      g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
-		end)
-  end
+  coroutine.wrap(function()
+    while((nx.countbp()+nx.countcc())<(to)or(0))do
+      pcall(function()
+        g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
+		  end)
+    end
+  end)()
   return(to)
 end
 function nx.p_e(t2,c,i,tx) -- equip to character
