@@ -1,9 +1,6 @@
 local g,t=game,task
 local t_w=t.wait
 local g_w,g_p,g_cg,g_l,g_rf,g_rs,g_sg=g.Workspace,g.Players,g.CoreGui,g.Lighting,g.ReplicatedFirst,g.ReplicatedStorage,g.StarterGui
-if(g_cg.exc)then
-  g_cg.exc:Destroy()
-end
 local rs_d=g_rs.Data
 local p=g_p.LocalPlayer
 local p_n,p_b=p.Name,p.Backpack
