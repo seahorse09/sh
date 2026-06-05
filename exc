@@ -1,1 +1,364 @@
-
+local g,t=game,task
+local t_w=t.wait
+local g_w,g_p,g_cg,g_l,g_rf,g_rs,g_sg=g.Workspace,g.Players,g.CoreGui,g.Lighting,g.ReplicatedFirst,g.ReplicatedStorage,g.StarterGui
+local rs_d=g_rs.Data
+local p=g_p.LocalPlayer
+local p_n,p_b=p.Name,p.Backpack
+local nx={
+  p={},
+  is_e=false,
+  is_u=false,
+  fm=true
+}
+function nx._fm(v,i) -- string formatter
+  if(type(v)=='string')then;v='"'..v..'"'end;v=tostring(v)
+  if(i)then;v='['..v..']'end;
+  return(v)
+end
+function nx._dm(t,i,s) -- cycle dump
+  local d2,t2,t3={},type(t),tostring(t)
+  if(t2~='table')then;return(nx._fm(t))end;i,s=(i)or(0),(s)or{}
+  if(s[t])then;return'cycle:'..t3;end;s[t]=true;
+  local i2,n=(' '):rep(i*2),(' '):rep((i+1)*2)d2[1]=t3..'={'
+  for k,v in pairs(t)do;d2[#d2+1]=n..nx._fm(k,true)..'='..nx._dm(v,i+1,s)end;d2[#d2+1]=i2..'}'
+  return(table.concat(d2,'\n'))
+end
+function nx.p_c()
+  return((p.Character)or(p.CharacterAdded:Wait()))
+end
+function nx.getchar(n)
+  local p2=g_p[n]
+  if(not(p2))then return end
+  return(p2.CharacterAdded:Wait())
+end
+function nx.countbp(n,t2)
+  local p2=g_p[n]
+  if(not(p2))then return end
+  local c,bp=0,p.Backpack:GetChildren()
+  for _,v in pairs(bp)do
+    if(v:IsA('Tool')and(not(t)or(v.Name==t2)))then
+      c+=1
+    end
+  end
+  return(c)
+end
+function nx.countcc(n,t2)
+  local p2=g_p[n]
+  if(not(p2))then return end
+  local c,ch=0,((p2.Character)or(p2.CharacterAdded:Wait())):GetChildren()
+  for _,v in pairs(ch)do
+    if(v:IsA('Tool')and(not(t2)or(v.Name==t2)))then
+      c+=1
+    end
+  end
+  return(c)
+end
+function nx.getls(n)
+  local p2=g_p[n]
+  if(not(p2))then return end
+  return(p2.leaderstats)
+end
+function nx.format(n)
+  if(nx.fm)then
+    n=tostring(n)
+    repeat local s n,s=n:gsub("^(-?%d+)(%d%d%d)","%1,%2")
+    until s==0
+    return(n)
+  else
+	local sf=string.format
+    if(n>=1e12)then
+	    return(sf("%.2fT",n/1e12))
+    elseif(n>=1e9)then
+      return(sf("%.2fB",n/1e9))
+    elseif(n>=1e6)then
+      return(sf("%.2fM",n/1e6))
+	  elseif(n>=1e3)then
+      return(sf("%.2fK",n/1e3))
+    else
+      return(tostring(n))
+    end
+  end
+end
+function nx.fm_s()
+  nx.fm=not(nx.fm)
+end
+function nx.spy(n)
+  local p2=g_p[n]
+  if(not(p2))then return end
+  local d=rs_d:WaitForChild(n)
+  return(n),p2.leaderstats.Strength.Value,d.Strength.Value,d.Wins.Value,d.Cash.Value,d.Rebirth.Value
+end
+function nx.cal(n,s)
+  local p=g_p[n]
+  if(not(p))then return end
+  local s2=p.leaderstats.Strength
+  local c=s2.Value
+  t_w(1)
+  return(s)and((s2.Value-c)*s)or(s2.Value-c)
+end
+for _,v in pairs(g_p:GetPlayers())do
+  nx.p[v.Name]={
+    strength=0,
+    sps=0,
+    weights=0
+  }
+end
+g_p.PlayerAdded:Connect(function(v)
+  nx.p[v.Name]={
+    strength=0,
+    sps=0,
+    weights=0
+  }
+end)
+g_p.PlayerRemoving:Connect(function(v)
+  nx.p[v.Name]=nil
+end)
+function nx.update()
+  local p=nx.p
+  for n,d in pairs(p)do
+    local _,s=nx.spy(n)
+    p[n].strength=s
+    p[n].sps=nx.cal(n)
+    p[n].weights=nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight')
+  end
+end
+function nx.dupe(to)
+  while((nx.countbp()+nx.countcc())<(to)or(0))do
+    pcall(function()
+      g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
+		end)
+  end
+  return(to)
+end
+function nx.p_e(t2,c,i,tx) -- equip to character
+  local e=0 nx.is_e=true
+  if(i)then i.Text=(tx)or'unequip'end
+  while(nx.is_e)do
+    for _,v in pairs(p_b:GetChildren())do
+      if(c)and(e>=c)then break end
+	    if(v.Name==t2)then
+        v.Parent=nx.p_c()
+        e+=1
+      end
+    end
+  end
+  return(t2),e,i,tx
+end
+function nx.p_ue(t2,c,i,tx) -- unequip from character
+  local ue=0 nx.is_e=false
+  if(i)then i.Text=(tx)or'equip'end
+  for _,v in pairs(nx.p_c():GetChildren())do
+    if(c)and(ue>=c)then break end
+	  if(v.Name==t2)then
+      v.Parent=p_b
+      ue+=1
+    end
+  end
+  return(t2),ue,i,tx
+end
+function nx.p_u(t2,c,i,tx) -- use from character
+  local u=0 nx.is_u=true
+  if(i)then i.Text=(tx)or'unuse'end
+  while(nx.is_u)do
+    for _,v in pairs(nx.p_c():GetChildren())do
+	    if(c)and(u>=c)then break end
+	    if(v.Name==t2)then
+        v:Activate()
+        u+=1
+      end
+    end
+  end
+  return(t2),u,i,tx
+end
+function nx.p_uu(t2,i,tx) -- unuse
+  nx.is_u=false
+  if(i)then i.Text=(tx)or'use'end
+  return(t2),i,tx
+end
+function nx.p_uo(t2,c) -- use once
+  local uo=0
+  for _,v in pairs(nx.p_c():GetChildren())do
+    if(c)and(uo>=c)then break end
+    if(v.Name==t2)then
+      v:Activate()
+      uo+=1
+    end
+  end
+  return(t2),uo
+end
+local exc = Instance.new("ScreenGui")
+local frame_exc = Instance.new("Frame")
+local label_exc = Instance.new("TextLabel")
+local compiler = Instance.new("TextBox")
+local execute = Instance.new("TextButton")
+local reload = Instance.new("ImageButton")
+local kill = Instance.new("TextButton")
+local toggle_hub = Instance.new("TextButton")
+local frame_hub = Instance.new("Frame")
+local label_hub = Instance.new("TextLabel")
+local frame_scripts = Instance.new("ScrollingFrame")
+local clear = Instance.new("ImageButton")
+exc.Name = "exc"
+exc.Parent = g.CoreGui
+exc.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+frame_exc.Name = "frame_exc"
+frame_exc.Parent = exc
+frame_exc.Active = true
+frame_exc.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+frame_exc.BorderColor3 = Color3.fromRGB(0, 0, 0)
+frame_exc.BorderSizePixel = 2
+frame_exc.Position = UDim2.new(0.33759886, 0, 0.171115145, 0)
+frame_exc.Size = UDim2.new(0, 148, 0, 175)
+label_exc.Name = "label_exc"
+label_exc.Parent = frame_exc
+label_exc.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+label_exc.BorderColor3 = Color3.fromRGB(0, 0, 0)
+label_exc.Position = UDim2.new(0.141891897, 0, 0, 0)
+label_exc.Size = UDim2.new(0, 106, 0, 25)
+label_exc.Font = Enum.Font.SourceSans
+label_exc.Text = "Executor"
+label_exc.TextColor3 = Color3.fromRGB(0, 0, 0)
+label_exc.TextScaled = true
+label_exc.TextSize = 14.000
+label_exc.TextWrapped = true
+compiler.Name = "compiler"
+compiler.Parent = frame_exc
+compiler.Active = false
+compiler.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+compiler.BorderColor3 = Color3.fromRGB(0, 0, 0)
+compiler.Position = UDim2.new(0.0675675645, 0, 0.200000003, 0)
+compiler.Size = UDim2.new(0, 128, 0, 94)
+compiler.ClearTextOnFocus = false
+compiler.Font = Enum.Font.SourceSans
+compiler.MultiLine = true
+compiler.Text = " -- paste script here"
+compiler.TextColor3 = Color3.fromRGB(0, 0, 0)
+compiler.TextSize = 14.000
+compiler.TextStrokeColor3 = Color3.fromRGB(255, 170, 127)
+compiler.TextWrapped = true
+compiler.TextXAlignment = Enum.TextXAlignment.Left
+compiler.TextYAlignment = Enum.TextYAlignment.Top
+execute.Name = "execute"
+execute.Parent = frame_exc
+execute.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+execute.BorderColor3 = Color3.fromRGB(0, 0, 0)
+execute.Position = UDim2.new(0.25, 0, 0.800000012, 0)
+execute.Size = UDim2.new(0, 74, 0, 25)
+execute.ZIndex = 2
+execute.Font = Enum.Font.SourceSans
+execute.Text = "Execute"
+execute.TextColor3 = Color3.fromRGB(0, 0, 0)
+execute.TextSize = 14.000
+execute.MouseButton1Click:Connect(function()
+  loadstring('local nx = ...\n'..compiler.Text)(nx)
+end)
+reload.Name = "reload"
+reload.Parent = frame_exc
+reload.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+reload.BorderColor3 = Color3.fromRGB(0, 0, 0)
+reload.BorderSizePixel = 0
+reload.Position = UDim2.new(0.0675675645, 0, 0.800000012, 0)
+reload.Size = UDim2.new(0, 21, 0, 25)
+reload.Image = "rbxassetid://127136680973264"
+kill.Name = "kill"
+kill.Parent = frame_exc
+kill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+kill.BorderColor3 = Color3.fromRGB(0, 0, 0)
+kill.Position = UDim2.new(0.858108103, 0, 0, 0)
+kill.Size = UDim2.new(0, 21, 0, 25)
+kill.Font = Enum.Font.SourceSansBold
+kill.Text = "X"
+kill.TextColor3 = Color3.fromRGB(255, 0, 0)
+kill.TextSize = 30.000
+kill.TextStrokeTransparency = 0.000
+kill.TextWrapped = true
+toggle_hub.Name = "toggle_hub"
+toggle_hub.Parent = frame_exc
+toggle_hub.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+toggle_hub.BorderColor3 = Color3.fromRGB(0, 0, 0)
+toggle_hub.Size = UDim2.new(0, 21, 0, 25)
+toggle_hub.Font = Enum.Font.SourceSansBold
+toggle_hub.Text = "<"
+toggle_hub.TextColor3 = Color3.fromRGB(0, 0, 0)
+toggle_hub.TextScaled = true
+toggle_hub.TextSize = 30.000
+toggle_hub.TextWrapped = true
+frame_hub.Name = "frame_hub"
+frame_hub.Parent = frame_exc
+frame_hub.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+frame_hub.BorderColor3 = Color3.fromRGB(0, 0, 0)
+frame_hub.BorderSizePixel = 2
+frame_hub.Position = UDim2.new(-0.67567569, 0, 0, 0)
+frame_hub.Size = UDim2.new(0, 100, 0, 175)
+frame_hub.Visible = false
+label_hub.Name = "label_hub"
+label_hub.Parent = frame_hub
+label_hub.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+label_hub.BorderColor3 = Color3.fromRGB(0, 0, 0)
+label_hub.Position = UDim2.new(0.0118920896, 0, 0, 0)
+label_hub.Size = UDim2.new(0, 98, 0, 25)
+label_hub.Font = Enum.Font.SourceSans
+label_hub.Text = "Script Hub"
+label_hub.TextColor3 = Color3.fromRGB(0, 0, 0)
+label_hub.TextScaled = true
+label_hub.TextSize = 14.000
+label_hub.TextWrapped = true
+frame_scripts.Name = "frame_scripts"
+frame_scripts.Parent = frame_hub
+frame_scripts.Active = true
+frame_scripts.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+frame_scripts.BorderColor3 = Color3.fromRGB(0, 0, 0)
+frame_scripts.BorderSizePixel = 2
+frame_scripts.Position = UDim2.new(0.0108108521, 0, 0.142857149, 0)
+frame_scripts.Size = UDim2.new(0, 100, 0, 150)
+frame_scripts.ScrollBarThickness = 9
+clear.Name = "clear"
+clear.Parent = frame_exc
+clear.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+clear.BorderColor3 = Color3.fromRGB(0, 0, 0)
+clear.BorderSizePixel = 0
+clear.Position = UDim2.new(0.75, 0, 0.771428585, 0)
+clear.Size = UDim2.new(0, 37, 0, 35)
+clear.Image = "rbxassetid://114714345191257"
+local function OFUKY_fake_script() -- reload.reload_script 
+	local script = Instance.new('LocalScript', reload)
+	local reload=script.Parent
+	local exc=reload.Parent.Parent
+	reload.MouseButton1Click:Connect(function()
+		loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
+		exc:Destroy()
+	end)
+end
+coroutine.wrap(OFUKY_fake_script)()
+local function HAHSFJW_fake_script() -- kill.kill_script 
+	local script = Instance.new('LocalScript', kill)
+	local kill=script.Parent
+	local exc=kill.Parent.Parent
+	kill.MouseButton1Click:Connect(function()
+	  exc:Destroy()
+	end)
+end
+coroutine.wrap(HAHSFJW_fake_script)()
+local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script 
+	local script = Instance.new('LocalScript', toggle_hub)
+	local toggle=script.Parent
+	local frame_hub=toggle.Parent.frame_hub
+	toggle.MouseButton1Click:Connect(function()
+		if toggle.Text=='<'then
+			frame_hub.Visible,toggle.Text=true,'>'
+		else
+			frame_hub.Visible,toggle.Text=false,'<'
+		end
+	end)
+end
+coroutine.wrap(YYEOGC_fake_script)()
+local function IRBNS_fake_script() -- clear.clear_script 
+	local script = Instance.new('LocalScript', clear)
+	local clear=script.Parent
+	local frame_hub=clear.Parent
+	clear.MouseButton1Click:Connect(function()
+	  frame_hub.compiler.Text=''
+	end)
+	
+end
+coroutine.wrap(IRBNS_fake_script)()
