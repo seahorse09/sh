@@ -10,10 +10,6 @@ local nx={
   is_u=false,
   fm=true
 }
-if(g_cg.nx)then
-  g_cg.nx:Destroy()
-  loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
-end
 function nx.p_c()
   return((p.Character)or(p.CharacterAdded:Wait()))
 end
