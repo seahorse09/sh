@@ -4,10 +4,44 @@ local g_w,g_p,g_cg,g_l,g_rf,g_rs,g_sg=g.Workspace,g.Players,g.CoreGui,g.Lighting
 local rs_d=g_rs.Data
 local p=g_p.LocalPlayer
 local p_n,p_b=p.Name,p.Backpack
+if(g_cg:FindFirstChild('exc'))then g_cg.exc:Destroy() end
 local nx={
-  p={},
+  p={
+    strength={},
+    strength_earned={},
+    strength_per_second={},
+    double_weights={}
+  },
   fm=true
 }
+function nx.update(n)
+  local p2=g_p[n]
+  if(not(p2))then return end
+  local p3=nx.p
+  p3.strength[n]=rs_d[n].Strength.Value
+  local s=g_p[n].leaderstats.Strength
+  p3.strength_earned[n]={
+    v=0,
+    c=s.Value
+  }
+  s:GetPropertyChangedSignal('Value'):Connect(function()
+    local e=p3.strength_earned[n]
+    local d=s.Value-e.v
+    e.v+=d
+    e.c=s.Value
+  end)
+  p3.strength_per_second[n]=nx.cal(n)
+  p3.double_weights[n]=nx.countall(n,'Double Weight')
+end
+for _,v in pairs(g_p:GetPlayers())do
+  nx.update(v.Name)
+end
+g_p.PlayerAdded:Connect(function(v)
+  nx.update(v.Name)
+end)
+g_p.PlayerRemoving:Connect(function(v)
+  nx.p[v.Name]=nil
+end)
 function nx._serialize(v,i)
   if(type(v)=='string')then
     return('"'..v..'"')
@@ -60,6 +94,9 @@ function nx.countcc(n,t2)
   end
   return(c)
 end
+function nx.countall(n,t2)
+  return nx.countcc(n,t2)+nx.countbp(n,t2)
+end
 function nx.getls(n)
   local p2=g_p[n]
   if(not(p2))then return end
@@ -101,40 +138,14 @@ function nx.cal(n,s)
   local s2=p.leaderstats.Strength
   local c=s2.Value
   t_w(1)
-  return(s)and((s2.Value-c)*s)or(s2.Value-c)
-end
-for _,v in pairs(g_p:GetPlayers())do
-  nx.p[v.Name]={
-    strength=0,
-    sps=0,
-    weights=0
-  }
-end
-g_p.PlayerAdded:Connect(function(v)
-  nx.p[v.Name]={
-    strength=0,
-    sps=0,
-    weights=0
-  }
-end)
-g_p.PlayerRemoving:Connect(function(v)
-  nx.p[v.Name]=nil
-end)
-function nx.update()
-  local p=nx.p
-  for n,d in pairs(p)do
-    local _,s=nx.spy(n)
-    p[n].strength=s
-    p[n].sps=nx.cal(n)
-    p[n].weights=nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight')
-  end
+  return(s2.Value-c)*((s)or(1))
 end
 function nx.dupe(am)
   am=(am)or(0)
   local n=p.Name
-  local to=(nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))+am
+  local to=nx.countall(n,'Double Weight')+am
   coroutine.wrap(function()
-    while((nx.countbp(n,'Double Weight')+nx.countcc(n,'Double Weight'))<to)do
+    while((nx.countall(n,'Double Weight'))<to)do
       t_w(0.1)
       pcall(function()
         g:GetService("MarketplaceService"):SignalPromptGamePassPurchaseFinished(p,5949054,true)
@@ -146,9 +157,8 @@ end
 function nx.rj()
   g:GetService("TeleportService"):Teleport(g.PlaceId,p)
 end
-function nx.p_e(t2,c,i,tx) -- equip to character
+function nx.p_e(t2,c) -- equip to character
   local e=0
-  if(i)then i.Text=(tx)or'unequip'end
   for _,v in pairs(p_b:GetChildren())do
     if(c)and(e>=c)then break end
 	  if(v.Name==t2)then
@@ -156,11 +166,10 @@ function nx.p_e(t2,c,i,tx) -- equip to character
       e+=1
     end
   end
-  return(t2),e,i,tx
+  return(t2),e
 end
-function nx.p_ue(t2,c,i,tx) -- unequip from character
-  local ue=0 nx.is_e=false
-  if(i)then i.Text=(tx)or'equip'end
+function nx.p_ue(t2,c) -- unequip from character
+  local ue=0
   for _,v in pairs(nx.p_c():GetChildren())do
     if(c)and(ue>=c)then break end
 	  if(v.Name==t2)then
@@ -168,11 +177,10 @@ function nx.p_ue(t2,c,i,tx) -- unequip from character
       ue+=1
     end
   end
-  return(t2),ue,i,tx
+  return(t2),ue
 end
-function nx.p_u(t2,c,i,tx) -- use from character
+function nx.p_u(t2,c) -- use from character
   local u=0
-  if(i)then i.Text=(tx)or'unuse'end
   for _,v in pairs(nx.p_c():GetChildren())do
 	  if(c)and(u>=c)then break end
 	  if(v.Name==t2)then
@@ -180,12 +188,7 @@ function nx.p_u(t2,c,i,tx) -- use from character
       u+=1
     end
   end
-  return(t2),u,i,tx
-end
-function nx.p_uu(t2,i,tx) -- unuse
-  nx.is_u=false
-  if(i)then i.Text=(tx)or'use'end
-  return(t2),i,tx
+  return(t2),u
 end
 local exc = Instance.new("ScreenGui")
 local frame_exc = Instance.new("Frame")
@@ -198,6 +201,11 @@ local toggle_hub = Instance.new("TextButton")
 local frame_hub = Instance.new("Frame")
 local label_hub = Instance.new("TextLabel")
 local frame_scripts = Instance.new("ScrollingFrame")
+local load_nx = Instance.new("TextButton")
+local load_cal = Instance.new("TextButton")
+local load_sh = Instance.new("TextButton")
+local load_shp = Instance.new("TextButton")
+local load_dex = Instance.new("TextButton")
 local clear = Instance.new("ImageButton")
 exc.Name = "exc"
 exc.Parent = g_cg
@@ -236,7 +244,6 @@ compiler.MultiLine = true
 compiler.Text = " -- paste script here"
 compiler.TextColor3 = Color3.fromRGB(0, 0, 0)
 compiler.TextSize = 14.000
-compiler.TextStrokeColor3 = Color3.fromRGB(255, 170, 127)
 compiler.TextWrapped = true
 compiler.TextXAlignment = Enum.TextXAlignment.Left
 compiler.TextYAlignment = Enum.TextYAlignment.Top
@@ -252,7 +259,7 @@ execute.Text = "Execute"
 execute.TextColor3 = Color3.fromRGB(0, 0, 0)
 execute.TextSize = 14.000
 execute.MouseButton1Click:Connect(function()
-  loadstring('local nx = ...\n'..compiler.Text)(nx)
+  loadstring('local nx=...\n'..compiler.Text)(nx)
 end)
 reload.Name = "reload"
 reload.Parent = frame_exc
@@ -313,7 +320,66 @@ frame_scripts.BorderColor3 = Color3.fromRGB(0, 0, 0)
 frame_scripts.BorderSizePixel = 2
 frame_scripts.Position = UDim2.new(0.0108108521, 0, 0.142857149, 0)
 frame_scripts.Size = UDim2.new(0, 100, 0, 150)
-frame_scripts.ScrollBarThickness = 9
+frame_scripts.ScrollBarThickness = 15
+load_nx.Name = "load_nx"
+load_nx.Parent = frame_scripts
+load_nx.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+load_nx.BorderColor3 = Color3.fromRGB(0, 0, 0)
+load_nx.Position = UDim2.new(0, 0, 0.0714285746, 0)
+load_nx.Size = UDim2.new(0, 84, 0, 25)
+load_nx.Font = Enum.Font.SourceSans
+load_nx.Text = "nx gui"
+load_nx.TextColor3 = Color3.fromRGB(0, 0, 0)
+load_nx.TextScaled = true
+load_nx.TextSize = 14.000
+load_nx.TextWrapped = true
+load_cal.Name = "load_cal"
+load_cal.Parent = frame_scripts
+load_cal.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+load_cal.BorderColor3 = Color3.fromRGB(0, 0, 0)
+load_cal.Position = UDim2.new(0, 0, 0.142857149, 0)
+load_cal.Size = UDim2.new(0, 84, 0, 25)
+load_cal.Font = Enum.Font.SourceSans
+load_cal.Text = "nx sps"
+load_cal.TextColor3 = Color3.fromRGB(0, 0, 0)
+load_cal.TextScaled = true
+load_cal.TextSize = 14.000
+load_cal.TextWrapped = true
+load_sh.Name = "load_sh"
+load_sh.Parent = frame_scripts
+load_sh.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+load_sh.BorderColor3 = Color3.fromRGB(0, 0, 0)
+load_sh.Position = UDim2.new(0, 0, 0.214285716, 0)
+load_sh.Size = UDim2.new(0, 84, 0, 25)
+load_sh.Font = Enum.Font.SourceSans
+load_sh.Text = "synex hub"
+load_sh.TextColor3 = Color3.fromRGB(0, 0, 0)
+load_sh.TextScaled = true
+load_sh.TextSize = 14.000
+load_sh.TextWrapped = true
+load_shp.Name = "load_shp"
+load_shp.Parent = frame_scripts
+load_shp.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+load_shp.BorderColor3 = Color3.fromRGB(0, 0, 0)
+load_shp.Position = UDim2.new(0, 0, 0.285714298, 0)
+load_shp.Size = UDim2.new(0, 84, 0, 25)
+load_shp.Font = Enum.Font.SourceSans
+load_shp.Text = "synex prem"
+load_shp.TextColor3 = Color3.fromRGB(0, 0, 0)
+load_shp.TextScaled = true
+load_shp.TextSize = 14.000
+load_shp.TextWrapped = true
+load_dex.Name = "load_dex"
+load_dex.Parent = frame_scripts
+load_dex.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+load_dex.BorderColor3 = Color3.fromRGB(0, 0, 0)
+load_dex.Size = UDim2.new(0, 84, 0, 25)
+load_dex.Font = Enum.Font.SourceSans
+load_dex.Text = "dex exp"
+load_dex.TextColor3 = Color3.fromRGB(0, 0, 0)
+load_dex.TextScaled = true
+load_dex.TextSize = 14.000
+load_dex.TextWrapped = true
 clear.Name = "clear"
 clear.Parent = frame_exc
 clear.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -322,16 +388,25 @@ clear.BorderSizePixel = 0
 clear.Position = UDim2.new(0.75, 0, 0.771428585, 0)
 clear.Size = UDim2.new(0, 37, 0, 35)
 clear.Image = "rbxassetid://114714345191257"
-local function OFUKY_fake_script() -- reload.reload_script 
+local function UTWURQQ_fake_script() -- compiler.compiler_script 
+	local script = Instance.new('LocalScript', compiler)
+	local compiler=script.Parent
+	compiler.MouseButton1Click:Connect(function()
+	  compiler:CaptureFocus()
+	end)
+end
+coroutine.wrap(UTWURQQ_fake_script)()
+local function NGKHANC_fake_script() -- reload.reload_script 
 	local script = Instance.new('LocalScript', reload)
 	local reload=script.Parent
 	local exc=reload.Parent.Parent
 	reload.MouseButton1Click:Connect(function()
-    loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
+		loadstring(g:HttpGet('https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/exc'))()
+		exc:Destroy()
 	end)
 end
-coroutine.wrap(OFUKY_fake_script)()
-local function HAHSFJW_fake_script() -- kill.kill_script 
+coroutine.wrap(NGKHANC_fake_script)()
+local function ZFCP_fake_script() -- kill.kill_script 
 	local script = Instance.new('LocalScript', kill)
 	local kill=script.Parent
 	local exc=kill.Parent.Parent
@@ -339,8 +414,8 @@ local function HAHSFJW_fake_script() -- kill.kill_script
 	  exc:Destroy()
 	end)
 end
-coroutine.wrap(HAHSFJW_fake_script)()
-local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script 
+coroutine.wrap(ZFCP_fake_script)()
+local function CWFOSL_fake_script() -- toggle_hub.toggle_hub_script 
 	local script = Instance.new('LocalScript', toggle_hub)
 	local toggle=script.Parent
 	local frame_hub=toggle.Parent.frame_hub
@@ -352,13 +427,59 @@ local function YYEOGC_fake_script() -- toggle_hub.toggle_hub_script
 		end
 	end)
 end
-coroutine.wrap(YYEOGC_fake_script)()
-local function IRBNS_fake_script() -- clear.clear_script 
+coroutine.wrap(CWFOSL_fake_script)()
+local function GUHSI_fake_script() -- load_nx.load_nx_script 
+	local script = Instance.new('LocalScript', load_nx)
+	local load_nx=script.Parent
+	local compiler=load_nx.Parent.Parent.Parent.compiler
+	load_nx.MouseButton1Click:Connect(function()
+		compiler.Text='loadstring(game:HttpGet("https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/min"))()'
+	end)
+end
+coroutine.wrap(GUHSI_fake_script)()
+local function HWINSUM_fake_script() -- load_cal.load_cal_script 
+	local script = Instance.new('LocalScript', load_cal)
+	local load_cal=script.Parent
+	local compiler=load_cal.Parent.Parent.Parent.compiler
+	load_cal.MouseButton1Click:Connect(function()
+		compiler.Text='loadstring(game:HttpGet("https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/cal"))()'
+	end)
+end
+coroutine.wrap(HWINSUM_fake_script)()
+local function UZSWNV_fake_script() -- load_sh.load_sh_script 
+	local script = Instance.new('LocalScript', load_sh)
+	local load_sh=script.Parent
+	local compiler=load_sh.Parent.Parent.Parent.compiler
+	load_sh.MouseButton1Click:Connect(function()
+	  compiler.Text='loadstring(game:HttpGet("https://raw.githubusercontent.com/MCG904YT/Versions/main/Select"))()'
+	end)
+end
+coroutine.wrap(UZSWNV_fake_script)()
+local function TTFKQR_fake_script() -- load_shp.load_shp_script 
+	local script = Instance.new('LocalScript', load_shp)
+	local load_shp=script.Parent
+	local compiler=load_shp.Parent.Parent.Parent.compiler
+	load_shp.MouseButton1Click:Connect(function()
+	  compiler.Text='loadstring(game:HttpGet("https://raw.githubusercontent.com/seahorse09/sh/refs/heads/main/db"))()'
+	end)
+end
+coroutine.wrap(TTFKQR_fake_script)()
+local function BPSQH_fake_script() -- load_dex.load_dex_script 
+	local script = Instance.new('LocalScript', load_dex)
+	local load_dex=script.Parent
+	local compiler=load_dex.Parent.Parent.Parent.compiler
+	load_dex.MouseButton1Click:Connect(function()
+		compiler.Text='loadstring(game:HttpGet("https://github.com/FusionWTF/Dex-Explorer/releases/download/Beta/out.lua"))()'
+	end)
+end
+coroutine.wrap(BPSQH_fake_script)()
+local function HPUU_fake_script() -- clear.clear_script 
 	local script = Instance.new('LocalScript', clear)
 	local clear=script.Parent
 	local frame_hub=clear.Parent
 	clear.MouseButton1Click:Connect(function()
 	  frame_hub.compiler.Text=''
 	end)
+	
 end
-coroutine.wrap(IRBNS_fake_script)()
+coroutine.wrap(HPUU_fake_script)()
